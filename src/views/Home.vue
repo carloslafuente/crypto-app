@@ -1,11 +1,14 @@
 <template>
   <div class="home flex justify-center">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <px-assets-table />
   </div>
 </template>
 
 <script>
+import PxAssetsTable from '../components/PxAssetsTable.vue';
+
 export default {
   name: 'Home',
-}
+  components: { PxAssetsTable },
+};
 </script>
