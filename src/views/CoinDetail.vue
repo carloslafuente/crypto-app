@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-col items-center mt-10">
+  <div class="flex flex-col items-center mt-10 md:px-20">
     <pulse-loader
       :loading="loading"
       :color="'#2dc281'"
       :size="'50px'"
     ></pulse-loader>
-    <template v-if="!!asset && !loading">
-      <div class="flex flex-col sm:flex-row justify-around items-center w-screen">
+    <template v-if="!loading">
+      <div class="flex flex-col md:flex-row justify-around items-center w-full">
         <div class="flex flex-col items-center">
           <img
             class="w-20 h-20 mr-5"
@@ -81,6 +81,47 @@
           <span class="text-xl"></span>
         </div>
       </div>
+      <line-chart
+        class="my-10"
+        :colors="['orange']"
+        :min="min"
+        :max="max"
+        :data="
+          history.map((history) => [
+            history.date,
+            parseFloat(history.priceUsd).toFixed(2),
+          ])
+        "
+      ></line-chart>
+
+      <div class="flex flex-col items-center w-full mb-10">
+        <h3 class="text-xl my-10">Mejores Ofertas de Cambio</h3>
+        <table class="w-full">
+          <tr
+            v-for="market in markets"
+            :key="`${market.exchangeId}-${market.priceUsd}`"
+            class="border-b"
+          >
+            <td>
+              <b>{{ market.exchangeId }}</b>
+            </td>
+            <td>{{ dollarFilter(market.priceUsd) }}</td>
+            <td>{{ market.baseSymbol }} / {{ market.quoteSymbol }}</td>
+            <td>
+              <px-button
+                :loading="market.loading || false"
+                v-if="!market.url"
+                @customClick="getExchange(market)"
+              >
+                <span>Obtener Link</span>
+              </px-button>
+              <a v-else class="hover:underline text-green-600" target="_blanck">
+                {{ market.url }}
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
     </template>
   </div>
 </template>
@@ -88,13 +129,16 @@
 <script>
 import api from '@/services/api';
 import { dollarFilter, percentFilter } from '@/helpers/filters';
+import PxButton from '@/components/PxButton.vue';
 
 export default {
-  name: 'CoinDetail',
+  name: 'CoinDeail',
+  components: { PxButton },
   data() {
     return {
-      asset: null,
+      asset: {},
       history: [],
+      markets: [],
       loading: true,
     };
   },
@@ -126,14 +170,26 @@ export default {
   methods: {
     getCoin() {
       const id = this.$route.params.id;
-      Promise.all([api.getAsset(id), api.getAssetHistory(id)])
-        .then(([asset, history]) => {
+      Promise.all([
+        api.getAsset(id),
+        api.getAssetHistory(id),
+        api.getMarkets(id),
+      ])
+        .then(([asset, history, markets]) => {
           this.asset = asset;
           this.history = history;
+          this.markets = markets;
         })
         .finally(() => {
           this.loading = false;
         });
+    },
+    getExchange(exchange) {
+      exchange.loading = true;
+      return api.getExchange(exchange.exchangeId).then((res) => {
+        exchange.url = res.exchangeUrl;
+        exchange.loading = false;
+      });
     },
     dollarFilter,
     percentFilter,
