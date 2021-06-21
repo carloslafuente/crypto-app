@@ -3,9 +3,12 @@
     <nav class="flex items-center justify-between flex-wrap bg-green-400 p-6">
       <div class="flex items-center text-white mr-6">
         <px-icon class="mr-2" />
-        <span class="font-semibold text-xl tracking-tight">
+        <router-link
+          :to="{ name: 'Home' }"
+          class="font-semibold text-xl tracking-tight"
+        >
           PlatziExchange
-        </span>
+        </router-link>
       </div>
 
       <div class="text-lg text-white">

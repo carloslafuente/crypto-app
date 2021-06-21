@@ -6,7 +6,7 @@
 
 <script>
 import PxAssetsTable from '../components/PxAssetsTable.vue';
-import api from '../services/api.js';
+import api from '@/services/api.js';
 
 export default {
   name: 'Home',

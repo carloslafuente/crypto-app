@@ -4,10 +4,3 @@
     <router-link to="/">Go to home page</router-link>
   </div>
 </template>
-
-<script>
-
-export default {
-  name: 'Error',
-};
-</script>

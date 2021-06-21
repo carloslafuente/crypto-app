@@ -21,6 +21,7 @@
       >
         <td>
           <img
+            class="w-6 h-6"
             :src="
               `https://static.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`
             "
@@ -31,31 +32,59 @@
           <b>#{{ asset.rank }}</b>
         </td>
         <td>
-          {{ asset.name }}
+          <router-link
+            class="hover:underline text-green-600"
+            :to="{ name: 'CoinDetail', params: { id: asset.id } }"
+          >
+            {{ asset.name }}
+            <small class="ml-1 text-gray-500">
+              {{ asset.symbol }}
+            </small>
+          </router-link>
         </td>
         <td>
-          {{ asset.priceUsd }}
+          {{ dollarFilter(asset.priceUsd) }}
         </td>
         <td>
-          {{ asset.marketCapUsd }}
+          {{ dollarFilter(asset.marketCapUsd) }}
         </td>
-        <td>
-          {{ asset.changePercent24Hr }}
+        <td
+          :class="
+            asset.changePercent24Hr.includes('-')
+              ? 'text-red-600'
+              : 'text-green-200'
+          "
+        >
+          {{ percentFilter(asset.changePercent24Hr) }}
         </td>
-        <td class="hidden sm:block"></td>
+        <td class="hidden sm:block">
+          <px-button @customClick="goToCoin(asset.id)">
+            <span>Detalle</span>
+          </px-button>
+        </td>
       </tr>
     </tbody>
   </table>
 </template>
 
 <script>
+import { dollarFilter, percentFilter } from '@/helpers/filters.js';
+import PxButton from '@/components/PxButton.vue';
+
 export default {
   name: 'PxAssetsTable',
-
+  components: { PxButton },
   props: {
     assets: {
       type: Array,
       default: () => [],
+    },
+  },
+  methods: {
+    dollarFilter,
+    percentFilter,
+    goToCoin(id) {
+      this.$router.push({ name: 'CoinDetail', params: { id } });
     },
   },
 };
