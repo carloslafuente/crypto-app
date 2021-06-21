@@ -1,7 +1,12 @@
 <template>
-  <div class="flex-">
-    <template v-if="!!asset">
-      <div class="flex flex-col sm:flex-row justify-around items-center">
+  <div class="flex flex-col items-center mt-10">
+    <pulse-loader
+      :loading="loading"
+      :color="'#2dc281'"
+      :size="'50px'"
+    ></pulse-loader>
+    <template v-if="!!asset && !loading">
+      <div class="flex flex-col sm:flex-row justify-around items-center w-screen">
         <div class="flex flex-col items-center">
           <img
             class="w-20 h-20 mr-5"
@@ -90,6 +95,7 @@ export default {
     return {
       asset: null,
       history: [],
+      loading: true,
     };
   },
   created() {
@@ -120,12 +126,14 @@ export default {
   methods: {
     getCoin() {
       const id = this.$route.params.id;
-      Promise.all([api.getAsset(id), api.getAssetHistory(id)]).then(
-        ([asset, history]) => {
+      Promise.all([api.getAsset(id), api.getAssetHistory(id)])
+        .then(([asset, history]) => {
           this.asset = asset;
           this.history = history;
-        }
-      );
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     dollarFilter,
     percentFilter,

@@ -1,6 +1,11 @@
 <template>
-  <div class="home flex justify-center mt-10">
-    <px-assets-table :assets="assets" />
+  <div class="home flex flex-col items-center mt-10">
+    <pulse-loader
+      :loading="loading"
+      :color="'#2dc281'"
+      :size="'50px'"
+    ></pulse-loader>
+    <px-assets-table v-if="!loading" :assets="assets"></px-assets-table>
   </div>
 </template>
 
@@ -14,12 +19,18 @@ export default {
   data() {
     return {
       assets: [],
+      loading: true,
     };
   },
   created() {
-    api.getAssets().then((assets) => {
-      this.assets = assets;
-    });
+    api
+      .getAssets()
+      .then((assets) => {
+        this.assets = assets;
+      })
+      .finally(() => {
+        this.loading = false;
+      });
   },
 };
 </script>
